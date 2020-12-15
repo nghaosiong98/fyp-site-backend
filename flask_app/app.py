@@ -2,6 +2,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.models import load_model
 from flask import Flask, request, redirect, jsonify
 from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS
 import werkzeug
 import numpy as np
 import cv2
@@ -48,6 +49,7 @@ class Predict(Resource):
 
 
 server = Flask(__name__)
+CORS(server)
 api = Api(server)
 
 api.add_resource(Predict, '/predict')
