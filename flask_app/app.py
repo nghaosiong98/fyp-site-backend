@@ -2,7 +2,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.models import load_model
 from flask import Flask, jsonify
 from flask_restful import Api, Resource, reqparse
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import werkzeug
 import numpy as np
 import cv2
@@ -27,7 +27,6 @@ class Predict(Resource):
         (o1, o2) = self.model.predict(preprocessed_image)[0]
         return o1, o2
 
-    @cross_origin(origin='*', headers=['Content-Type', 'Authorization'])
     def post(self):
         lat = self.req_parser.parse_args(strict=True).get("lat", None)
         lng = self.req_parser.parse_args(strict=True).get("lng", None)
@@ -60,7 +59,7 @@ class Predict(Resource):
 
 
 server = Flask(__name__)
-CORS(server, resources={r"/*": {"origins": "*"}})
+CORS(server)
 api = Api(server)
 
 api.add_resource(Predict, '/predict')
@@ -71,4 +70,5 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
