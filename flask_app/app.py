@@ -27,7 +27,7 @@ class Predict(Resource):
         (o1, o2) = self.model.predict(preprocessed_image)[0]
         return o1, o2
 
-    @cross_origin()
+    @cross_origin(origin='*', headers=['Content-Type', 'Authorization'])
     def post(self):
         lat = self.req_parser.parse_args(strict=True).get("lat", None)
         lng = self.req_parser.parse_args(strict=True).get("lng", None)
