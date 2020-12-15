@@ -60,7 +60,7 @@ class Predict(Resource):
 
 
 server = Flask(__name__)
-CORS(server)
+CORS(server, resources={r"/*": {"origins": "*"}})
 api = Api(server)
 
 api.add_resource(Predict, '/predict')
