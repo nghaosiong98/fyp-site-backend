@@ -1,7 +1,7 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.models import load_model
-from flask import Flask, request, redirect, jsonify
-from flask_restful import Api, Resource, reqparse
+from flask import Flask, jsonify
+from flask_restful import Api, Resource, reqparse, abort
 from flask_cors import CORS
 import werkzeug
 import numpy as np
@@ -10,8 +10,11 @@ import cv2
 
 class Predict(Resource):
     def __init__(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("images", type=werkzeug.datastructures.FileStorage, location='files', action='append')
+        parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument("images", type=werkzeug.datastructures.FileStorage, location='files', action='append',
+                            required=True, help='please select at least 1 images')
+        parser.add_argument("lat", required=True, help="lat is missing")
+        parser.add_argument("lng", required=True, help="lng is missing")
         self.req_parser = parser
 
         self.model = load_model('model')
@@ -25,6 +28,8 @@ class Predict(Resource):
         return o1, o2
 
     def post(self):
+        lat = self.req_parser.parse_args(strict=True).get("lat", None)
+        lng = self.req_parser.parse_args(strict=True).get("lng", None)
         images = self.req_parser.parse_args(strict=True).get("images", None)
         responses = []
         for image in images:
@@ -38,7 +43,11 @@ class Predict(Resource):
                 'result': {
                     0: float(o1),
                     1: float(o2),
-                }
+                },
+                'location': {
+                    'lat': float(lat),
+                    'lng': float(lng),
+                },
             }
             responses.append(result)
 
