@@ -1,8 +1,8 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.models import load_model
 from flask import Flask, jsonify
-from flask_restful import Api, Resource, reqparse, abort
-from flask_cors import CORS
+from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS, cross_origin
 import werkzeug
 import numpy as np
 import cv2
@@ -27,10 +27,12 @@ class Predict(Resource):
         (o1, o2) = self.model.predict(preprocessed_image)[0]
         return o1, o2
 
+    @cross_origin()
     def post(self):
         lat = self.req_parser.parse_args(strict=True).get("lat", None)
         lng = self.req_parser.parse_args(strict=True).get("lng", None)
         images = self.req_parser.parse_args(strict=True).get("images", None)
+        server.logger.info("Number of imager")
         responses = []
         for image in images:
             filename = image.filename
