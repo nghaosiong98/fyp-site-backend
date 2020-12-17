@@ -28,12 +28,13 @@ def predict(images: List[UploadFile] = File(...), lat: float = Body(...), lng: f
         'lng': float(lng),
     }
     for image in images:
-        o1, o2 = model.predict(image.file.read())
+        o1, o2, label = model.predict(image.file.read())
         response['results'].append({
             'filename': image.filename,
             'prediction': {
                 0: float(o1),
                 1: float(o2),
-            }
+            },
+            'label': str(label),
         })
     return response

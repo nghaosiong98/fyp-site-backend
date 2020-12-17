@@ -19,4 +19,5 @@ class AlgaeModel:
         raw_image = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
         preprocessed_image = self.preprocess_image(raw_image)
         (o1, o2) = self.model.predict(preprocessed_image)[0]
-        return o1, o2
+        label = 'Eutrophic' if o1 > o2 else 'Not Eutrophic'
+        return o1, o2, label
