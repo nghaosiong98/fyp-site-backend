@@ -1,20 +1,30 @@
 from typing import List
 from fastapi import FastAPI, File, UploadFile, Body
 # from fastapi.middleware.cors import CORSMiddleware
-# from starlette.middleware import Middleware
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from Model import AlgaeModel
 
-app = FastAPI()
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=['*', 'https://fyp.haosiongng.com', 'http://localhost:3000'],
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
+]
+
+app = FastAPI(middleware=middleware)
 model = AlgaeModel()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*'],
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=['*', 'https://fyp.haosiongng.com', 'http://localhost:3000'],
+#     allow_credentials=True,
+#     allow_methods=['*'],
+#     allow_headers=['*'],
+# )
 
 
 @app.get("/predict")
