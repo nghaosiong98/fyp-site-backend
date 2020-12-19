@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import FastAPI, File, UploadFile, Body
+from fastapi.responses import JSONResponse
 # from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
@@ -49,4 +50,7 @@ def predict(images: List[UploadFile] = File(...), lat: float = Body(...), lng: f
             },
             'label': str(label),
         })
-    return response
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+    }
+    return JSONResponse(content=response, headers=headers)
