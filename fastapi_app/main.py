@@ -19,6 +19,7 @@ middleware = [
 app = FastAPI(middleware=middleware)
 model = AlgaeModel()
 
+
 # app.add_middleware(
 #     CORSMiddleware,
 #     allow_origins=['*', 'https://fyp.haosiongng.com', 'http://localhost:3000'],
@@ -26,6 +27,18 @@ model = AlgaeModel()
 #     allow_methods=['*'],
 #     allow_headers=['*'],
 # )
+
+@app.get("/")
+def test_root():
+    return {"status": "OK"}
+
+
+@app.post("/")
+def test_root_post():
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+    }
+    return JSONResponse(content={"status": "OK"}, headers=headers)
 
 
 @app.get("/predict")
