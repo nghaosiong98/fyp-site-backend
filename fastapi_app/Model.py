@@ -19,10 +19,8 @@ class AlgaeModel:
         preprocessed_image = np.expand_dims(preprocessed_image, axis=0)
         return preprocessed_image
 
-    def predict(self, image_string):
-        nparr = np.fromstring(image_string, np.uint8)
-        raw_image = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
-        preprocessed_image = self.preprocess_image(raw_image)
+    def predict(self, image):
+        preprocessed_image = self.preprocess_image(image)
         (o1, o2) = self.model.predict(preprocessed_image)[0]
         label = 'Eutrophic' if o1 > o2 else 'Not Eutrophic'
         return o1, o2, label
@@ -50,11 +48,14 @@ class WaterModel:
         else:
             self.cfg.MODEL.DEVICE = "cpu"
 
-    def inference(self, img_str):
+    def inference(self, image):
         predictor = DefaultPredictor(self.cfg)
-        nparr = np.frombuffer(img_str, 'u1')
-        im = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        outputs = predictor(im)
-        mask = np.asarray(outputs['instances'].pred_masks.cpu().numpy()[0], dtype=np.uint8)
-        cropped = cv2.bitwise_and(im, im, mask=mask)
+        outputs = predictor(image)
+        box = np.asarray(outputs['instances'].pred_boxes.tensor.cpu().numpy()[0], dtype=int)
+        (h, w) = image.shape[:2]
+        print(box)
+        (start_x, start_y, end_x, end_y) = box
+        (start_x, start_y) = (max(0, start_x), max(0, start_y))
+        (end_x, end_y) = (min(w - 1, end_x), min(h - 1, end_y))
+        cropped = image[start_x:end_x, start_y:end_y]
         return cropped
