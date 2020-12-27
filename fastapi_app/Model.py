@@ -51,9 +51,12 @@ class WaterModel:
     def inference(self, image):
         predictor = DefaultPredictor(self.cfg)
         outputs = predictor(image)
-        box = np.asarray(outputs['instances'].pred_boxes.tensor.cpu().numpy()[0], dtype=int)
+        instances = outputs['instances']
+        if len(instances) == 0:
+            return None
+        confident_detections = instances[instances.scores == max(instances.scores)]
+        box = np.asarray(confident_detections.pred_boxes.tensor.cpu().numpy()[0], dtype=int)
         (h, w) = image.shape[:2]
-        print(box)
         (start_x, start_y, end_x, end_y) = box
         (start_x, start_y) = (max(0, start_x), max(0, start_y))
         (end_x, end_y) = (min(w - 1, end_x), min(h - 1, end_y))

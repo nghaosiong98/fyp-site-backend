@@ -23,7 +23,7 @@ water_model = WaterModel()
 
 @app.get("/")
 def test_root():
-    return {"status": "OK"}
+    return {"msg": "OK"}
 
 
 @app.post("/")
@@ -31,12 +31,12 @@ def test_root_post():
     headers = {
         "Access-Control-Allow-Origin": "*",
     }
-    return JSONResponse(content={"status": "OK"}, headers=headers)
+    return JSONResponse(content={"msg": "OK"}, headers=headers)
 
 
 @app.get("/predict")
 def test_api():
-    return {"status": "OK"}
+    return {"msg": "OK"}
 
 
 @app.post("/predict")
@@ -50,6 +50,16 @@ def predict(images: List[UploadFile] = File(...), lat: float = Body(...), lng: f
         byte_string = image.file.read()
         im = byte_to_img(byte_string)
         cropped_im = water_model.inference(im)
+        if cropped_im is None:
+            response['results'].append({
+                'filename': image.filename,
+                'prediction': {
+                    0: None,
+                    1: None,
+                },
+                'label': 'No lake found.'
+            })
+            continue
         o1, o2, label = model.predict(cropped_im)
         response['results'].append({
             'filename': image.filename,
