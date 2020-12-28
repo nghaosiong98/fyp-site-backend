@@ -22,7 +22,7 @@ class AlgaeModel:
     def predict(self, image):
         preprocessed_image = self.preprocess_image(image)
         (o1, o2) = self.model.predict(preprocessed_image)[0]
-        label = 'Eutrophic' if o1 > o2 else 'Not Eutrophic'
+        label = 1 if o1 > o2 else 0
         return o1, o2, label
 
 

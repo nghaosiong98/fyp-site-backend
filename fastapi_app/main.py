@@ -57,7 +57,7 @@ def predict(images: List[UploadFile] = File(...), lat: float = Body(...), lng: f
                     0: None,
                     1: None,
                 },
-                'label': 'No lake found.'
+                'label': -1
             })
             continue
         o1, o2, label = model.predict(cropped_im)
@@ -67,7 +67,7 @@ def predict(images: List[UploadFile] = File(...), lat: float = Body(...), lng: f
                 0: float(o1),
                 1: float(o2),
             },
-            'label': str(label),
+            'label': int(label),
         })
     headers = {
         "Access-Control-Allow-Origin": "*",
