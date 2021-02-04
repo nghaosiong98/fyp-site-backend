@@ -1,5 +1,5 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
-
+ENV GOOGLE_APPLICATION_CREDENTIALS fyp-backend-owner-sa.json
 RUN apt-get update
 RUN apt-get install 'ffmpeg'\
     'libsm6'\

@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from Model import AlgaeModel, WaterModel
-from utils import byte_to_img
+from utils import byte_to_img, upload_blob_with_metadata
 
 middleware = [
     Middleware(
@@ -61,6 +61,14 @@ def predict(images: List[UploadFile] = File(...), lat: float = Body(...), lng: f
             })
             continue
         o1, o2, label = model.predict(cropped_im)
+        metadata = {
+            'predict_0': float(o1),
+            'predict_1': float(o2),
+            'label': int(label),
+            'lat': float(lat),
+            'lng': float(lng),
+        }
+        upload_blob_with_metadata("fyp-backend-image", byte_string, image.filename, metadata)
         response['results'].append({
             'filename': image.filename,
             'prediction': {
